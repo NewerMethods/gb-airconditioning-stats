@@ -21,11 +21,17 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
 ## Current status (as of Aug 2026)
 
 - [x] PRD v0.1 drafted (`docs/PRD.md`)
-- [x] Phase 0 script written (`scripts/phase0_check.py`) — **NOT YET RUN**
-- [ ] **NEXT ACTION: run Phase 0** — pulls 2019–2025 OTS data for six CN8 codes,
-      checks supplementary-unit population rates. Go criterion: ≥90% value
-      coverage on 84151010/84151090/84158100/84158200. This is the go/no-go
-      for the whole trade-data approach.
+- [x] Phase 0 script written (`scripts/phase0_check.py`)
+- [x] **Phase 0 RUN (1 Aug 2026): GO criterion FAILED — SuppUnit is 0% on all
+      six codes.** Structural, not a data gap: the UK tariff assigns no
+      supplementary-unit measure to 8415 codes, so item counts are never
+      declared. NetMass covers 100% of import value with zero suppression →
+      net-mass fallback is viable. See docs/RESEARCH_NOTES.md (Phase 0 result)
+      and data/raw/uktradeinfo_ots/2026-08-01/ (first stored vintage).
+- [ ] **NEXT ACTION: decide unit-derivation approach for Phase 1** — net-mass ÷
+      assumed unit-mass (priors from spec sheets), possibly cross-checked with
+      Comtrade partner-mirror quantities / Eurostat COMEXT (EU CN still carries
+      p/st for 8415). Classifier must separate on value-per-kg, not value-per-unit.
 - [ ] Phase 1: core trade pipeline (ingestion → classification → apparent consumption)
 - [ ] Phase 2: anchors + use-case allocation engine + stock-flow model
 - [ ] Phase 3: validation gate tooling + freeze first vintage (v2026, covering CY2025)
@@ -38,9 +44,11 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
   rate limit. Base: https://api.uktradeinfo.com — endpoints /OTS, /RTS,
   /Commodity, /Country, /FlowType. Swagger: /swagger/ui/index
 - FlowTypeId: 1=EU imports, 2=EU exports, 3=non-EU imports, 4=non-EU exports
-- Quantity fields (NetMass kg + SuppUnit item counts) are published except under
-  suppression (SuppressionIndex 1/3/5 hide quantity). Parts code 84159000 has no
-  supplementary unit; machine codes carry item counts.
+- NetMass (kg) is published except under suppression (SuppressionIndex 1/3/5
+  hide quantity); observed suppression on the six codes 2019–2025 is zero.
+  SuppUnit (item counts) is NOT collected for any 8415/841861 code — the UK
+  tariff assigns them no supplementary-unit measure, so the field is always 0.
+  (Verified Phase 0, Aug 2026; earlier "machine codes carry item counts" was wrong.)
 - The API rejects some sandboxed/bot fetchers — always send a browser-like
   User-Agent header from scripts.
 - EHS 2023–24 (EDRC/Reading reanalysis, June 2026): 4.3% of English households
@@ -97,8 +105,11 @@ layer — it validates, it does not feed.
 
 ## Open items
 
-- Q1 (unit population rates): OPEN until phase0_check.py is run. Verify field
-  casing (SuppUnit/NetMass/SuppressionIndex) against Swagger on first call.
+- Q1 (unit population rates): RESOLVED 1 Aug 2026 — SuppUnit never populated
+  (no supplementary-unit measure in UK tariff for these codes); field casing
+  verified against live API. Net-mass fallback confirmed viable (100% value
+  coverage, zero suppression). New open question: source of unit-mass priors
+  and whether Comtrade/COMEXT mirrors can recover true item counts.
 - BSRIA purchase: agreed for year 1 (calibration), skip years 2–3. Check FERF /
   NESO-contact access before buying.
 - Chillers (84186900): value-index satellite series only; excluded from unit counts.
