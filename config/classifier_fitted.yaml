@@ -1,0 +1,11 @@
+fitted:
+  t1_t6_log_vpk_threshold: 8.97
+  vrf_vpk_threshold: 16.8
+fit_meta:
+  training_year: 2024
+  fit_date: '2026-08-01'
+  method: 't1_t6: mass-weighted 2-means on log10(GBP/kg), 841581/82 imports; vrf:
+    mass-weighted q0.85 of GBP/kg, 84151090 imports'
+  n_rows:
+    t1_t6: 1074
+    vrf: 430

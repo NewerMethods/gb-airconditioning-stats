@@ -1,0 +1,23 @@
+# Unit-mass priors (kg per unit) for net-mass unit derivation.
+# Required because HMRC OTS carries no supplementary units for 8415/841861
+# (Phase 0, Aug 2026): units = NetMass / kg_per_unit.
+# central drives the point estimate; p10/p90 drive the unit-count band
+# (units_p10 = mass / kg_p90, units_p90 = mass / kg_p10).
+# Sources: Comtrade partner-route ratios (docs/RESEARCH_NOTES.md "Mirror
+# unit-count check", 2024) blended with manufacturer spec sheets.
+# Revisit at each validation gate; re-pull Comtrade ratios annually.
+priors:
+  T1: {central: 28, p10: 22, p90: 35,
+       note: "Portable monobloc; China->UK 841582 24.1 kg/u (portable-heavy mix); specs 22-35 kg"}
+  T2: {central: 35, p10: 25, p90: 55,
+       note: "Window/wall self-contained; specs 30-60 kg; China->UK 841510 29.3 kg/u is a T2/T3 blend"}
+  T3: {central: 32, p10: 24, p90: 45,
+       note: "Single split shipped as system (outdoor ~23-30 kg + indoor ~8-12 kg)"}
+  T4: {central: 75, p10: 50, p90: 110,
+       note: "Multi-split system: outdoor 40-60 kg + 2-4 indoor units"}
+  T5: {central: 180, p10: 120, p90: 350,
+       note: "VRF outdoor module; 'unit' = module, not system. TM44 provides capacity-side check in Phase 2"}
+  T6: {central: 250, p10: 120, p90: 500,
+       note: "Packaged/rooftop; USA route ratios 86-99 kg/u skew light (mixed with portables); specs 120-500 kg"}
+  T7: {central: 90, p10: 60, p90: 140,
+       note: "A2A heat pump; China->UK 841861 98.4 kg/u, Malaysia 40.1, Japan 240 (route mix)"}

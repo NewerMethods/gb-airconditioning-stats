@@ -1,0 +1,44 @@
+# Type-classification engine settings (PRD FR3).
+# Signal is value-per-kg (GBP/kg) at OTS row level — value-per-unit is
+# unavailable (Phase 0: no supplementary units).
+# Thresholds are fitted on the training year by
+#   scripts/run_phase1.py --fit-classifier
+# which rewrites the `fitted` block below (config over code: fitted values
+# live here, with provenance, never hardcoded).
+training_year: 2024
+defaults:
+  # Used until a fit is run; sanity values from Phase 0 distributions.
+  t1_t6_log_vpk_threshold: 18.0   # GBP/kg separating T1 (below) from T6 (above) in 841581/82
+  vrf_vpk_threshold: 40.0         # GBP/kg above which 84151090 rows lean T5 (VRF premium tail)
+  edge_vpk_threshold: 250.0       # rows above this are out-of-scope edge (civil-aircraft units)
+# Fitted thresholds are written to config/classifier_fitted.yaml by the fit
+# run and merged over `defaults` at load time.
+fit:
+  # T5 threshold = this mass-weighted quantile of value-per-kg within 84151090
+  # (VRF is the premium tail of the split code, PRD T5).
+  vrf_mass_quantile: 0.85
+rules:
+  # Band around a threshold (in log10 space) inside which rows are reported
+  # as UNALLOCATED rather than forced (FR3.3).
+  unallocated_log10_band: 0.08
+  # Confidence mapping: log10 distance from threshold that earns max confidence.
+  full_confidence_log10_distance: 0.5
+  confidence_floor: 0.55
+  confidence_cap: 0.95
+  high_confidence_min: 0.70       # S3 metric counts units at/above this
+  # T3/T4 allocation of non-VRF split mass is a modelled prior, not a signal.
+  t3_t4_mass_shares: {T3: 0.72, T4: 0.28}
+  prior_allocation_confidence: 0.40
+harmonisation:
+  # OTS is UK-wide; GB series = UK * (1 - ni_import_share). Named assumption
+  # (PRD FR2.2) pending an RTS-based estimate; sensitivity range 0.01-0.04.
+  ni_import_share: 0.025
+cleaning:
+  # Logged corrections for implausible declarations (owner convention:
+  # iterative cleaning with logged corrections; log at data/clean/corrections_log.csv).
+  # A row below the floor with material mass is a suspected mass
+  # mis-declaration (e.g. grams entered as kg: Spain 84158200 2021-08,
+  # 20,571,625 kg at GBP 0.02/kg; /1000 gives GBP 22.7/kg, in-profile).
+  vpk_implausible_floor: 0.5   # GBP/kg
+  mass_scale_fix_min_kg: 10000 # only rescale rows big enough to matter
+  vpk_plausible_band: [1.0, 500.0]  # /1000 must land here to accept the fix

@@ -33,11 +33,18 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
       from China/Malaysia/Japan/Türkiye/USA but only 23–71% value coverage and
       consignment-vs-origin asymmetry → use as kg/unit calibration priors, not
       direct counts. See RESEARCH_NOTES.md "Mirror unit-count check".
-- [ ] **NEXT ACTION: Phase 1 with net-mass unit derivation** — units =
-      NetMass ÷ unit-mass prior; priors from Comtrade partner-route kg/unit
-      ratios (China→UK 29.3 kg/u on 841510 etc.) blended with spec sheets,
-      re-pulled annually. Classifier separates on value-per-kg, not value-per-unit.
-- [ ] Phase 1: core trade pipeline (ingestion → classification → apparent consumption)
+- [x] **Phase 1 core built (1 Aug 2026)** — `scripts/run_phase1.py`: D1 full-window
+      ingestion → harmonise (logged corrections, 47 mass/1000 fixes) → value-per-kg
+      classifier (thresholds fitted on 2024, `config/classifier_fitted.yaml`) →
+      units = NetMass ÷ prior (`config/unit_mass_priors.yaml`) → monthly GB
+      apparent consumption by type with P10/P90 bands + D2 mirror check.
+      Outputs: `data/outputs/apparent_consumption_monthly.{parquet,csv}`.
+      Headline: ~370–600k units/yr apparent consumption 2019–2025.
+- [ ] **Phase 1 gaps before Phase 2**: S3 at 64.9% vs ≥90% target (T3/T4 prior
+      allocation is low-confidence by design — needs capacity-mix evidence);
+      NI share is a named assumption (RTS-based estimate pending); mirror check
+      breaches ±15% on all codes (consignment-vs-origin — VG2 needs an
+      origin-aware tolerance or EU-hub adjustment); Comtrade monthly needs a key.
 - [ ] Phase 2: anchors + use-case allocation engine + stock-flow model
 - [ ] Phase 3: validation gate tooling + freeze first vintage (v2026, covering CY2025)
 - [ ] Phase 4: scheduling, monitoring pack, optional dashboard
