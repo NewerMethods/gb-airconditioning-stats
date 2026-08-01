@@ -51,10 +51,19 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
       installed stock (U1 2.6m). **Residual vs EHS anchor +52% (bands overlap)
       — published, candidate explanations: opening-stock assumptions, portable
       retirement rate, EHS 'uses AC' understating ownership.**
-- [ ] **Phase 2 gaps**: D3 TM44 ingestion (needs opendatacommunities key),
-      D4 MCS, D6 CDD regression not yet ingested — allocation priors are
-      still uninformed by anchors (FR4.2 update step pending); initial-stock
-      assumptions need sensitivity work against the residual.
+- [x] D3 ingestion built (1 Aug 2026): `scripts/run_tm44.py` →
+      `pipeline/tm44.py`. NOTE: opendatacommunities is GONE — EPB data now
+      needs a GOV.UK One Login bearer token (human step; see README), and
+      ACIRs/TM44 reports are NOT published in bulk. Evidence used instead:
+      AIRCON_PRESENT / AIRCON_KW_RATING / AC_INSPECTION_COMMISSIONED fields
+      on non-domestic EPC + DEC records (RESEARCH_NOTES "TM44" section).
+      **Blocked on owner creating the token** — module tested against the
+      live API's auth failure modes and with synthetic data.
+- [ ] **Phase 2 gaps**: D3 run pending token; D4 MCS, D6 CDD regression not
+      yet ingested — allocation priors are still uninformed by anchors
+      (FR4.2 update step pending); initial-stock assumptions need
+      sensitivity work against the residual. Scotland EPB register is
+      separate — England+Wales only until added.
 - [ ] Phase 3: validation gate tooling + freeze first vintage (v2026, covering CY2025)
 - [ ] Phase 4: scheduling, monitoring pack, optional dashboard
 

@@ -19,10 +19,39 @@
   household adoption at 10–40%. (Cited in the EDRC publication above.)
 
 ### TM44 / non-domestic EPC register (commercial stock)
-- Systems >12 kW output require 5-yearly air conditioning inspection reports,
-  lodged on the non-domestic EPC register; bulk-downloadable via
-  opendatacommunities.org (API with free registration). Compliance imperfect
-  (~one-third by common estimates) — gross-up factor must be published.
+- Systems >12 kW output require 5-yearly air conditioning inspection reports
+  (ACIRs), lodged on the EPB register. Compliance imperfect (~one-third by
+  common estimates) — gross-up factor must be published.
+- **CORRECTIONS (verified 1 Aug 2026).** Two earlier beliefs are stale:
+  1. epc.opendatacommunities.org (email + API key) is GONE — replaced by
+     get-energy-performance-data.communities.gov.uk (MHCLG, beta). Auth is
+     now a bearer token from a **GOV.UK One Login** account ("My account"
+     page) — creating it is a human step (email verification + 2FA), it
+     cannot be scripted.
+  2. ACIRs/TM44 reports are NOT in the published data (not in the API
+     datasets, not in the EPB live tables, not in the quarterly statistical
+     release). The usable commercial-AC evidence is instead IN the
+     certificate records themselves: non-domestic EPC and DEC records both
+     carry AIRCON_PRESENT, AIRCON_KW_RATING, ESTIMATED_AIRCON_KW_RATING and
+     AC_INSPECTION_COMMISSIONED (1=inspection done, 2=commissioned, 3=none,
+     4=n/a, 5=unknown) — presence + capacity + a compliance signal.
+- New API (base https://api.get-energy-performance-data.communities.gov.uk,
+  headers `Authorization: Bearer <token>` + `Accept: application/json`):
+  - GET /api/files/{non-domestic|display|domestic}/csv → 302 to signed S3
+    zip of full data (non-domestic ≈2.9 GB, regenerated 1st of month);
+    /info sub-path gives size + lastUpdated. requests must follow the
+    redirect WITHOUT the bearer header (signed URL carries its own auth).
+  - GET /api/{non-domestic|display|domestic}/search — geographic/time
+    filters, 5,000 rows/page; plus a certificates-changed delta endpoint
+    (right tool for the quarterly D3 refresh).
+  - Data dictionaries download without auth: /download/data-dictionary?
+    property_type=non-domestic|display|domestic.
+  - England & Wales only; Scotland has a separate register
+    (scottishepcregister.org.uk) — GB coverage needs both.
+- Pipeline: `pipeline/tm44.py` + `scripts/run_tm44.py` ingest full loads as
+  immutable vintages under data/raw/epb/<pull_date>/ and reduce to per-year
+  AC evidence (data/outputs/tm44_ac_evidence.csv). Blocked only on the
+  human token step.
 
 ### Market reports (for context only — DO NOT use as data)
 - 2025 UK AC market size estimates range $1.33bn (OMR, 1.0% CAGR) to $1.85bn

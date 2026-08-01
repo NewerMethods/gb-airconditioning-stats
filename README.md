@@ -22,7 +22,22 @@ pip install -r requirements.txt
 python scripts/run_phase1.py              # ingest → classify → apparent consumption
 python scripts/run_phase1.py --fit-classifier   # also refit value/kg thresholds on the training year
 python scripts/run_phase2.py              # use-case allocation → stock-flow → EHS reconciliation
+python scripts/run_tm44.py                # D3: commercial AC evidence from the EPB register (needs token, below)
 ```
+
+### One-time setup: EPB register token (for `run_tm44.py`)
+
+The EPB data service moved to GOV.UK One Login — there is no scriptable
+key signup. Once, by hand:
+
+1. Go to <https://get-energy-performance-data.communities.gov.uk> and
+   sign in / create an account with GOV.UK One Login.
+2. Copy the bearer token from your **My account** page.
+3. Put `EPB_BEARER_TOKEN=<token>` in a `.env` file at the repo root
+   (git-ignored), or export it as an environment variable.
+
+Note the non-domestic full load is ~3 GB (regenerated monthly); the first
+`run_tm44.py` run downloads it once into `data/raw/epb/<date>/`.
 
 First run pulls ~7 years of HMRC OTS data (a few minutes; rate-limited).
 Pulls are stored under `data/raw/uktradeinfo_ots/<date>/` and reused on
