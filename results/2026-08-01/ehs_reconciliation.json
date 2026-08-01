@@ -1,0 +1,24 @@
+[
+  {
+    "anchor_year":2023,
+    "types_included":[
+      "T1",
+      "T2",
+      "T3",
+      "T4"
+    ],
+    "model_u1_stock":{
+      "central":2117076,
+      "lo":1193392,
+      "hi":3448167
+    },
+    "ehs_anchor_units":{
+      "central":1391250,
+      "lo":1091800,
+      "hi":1831680
+    },
+    "residual_units":725826,
+    "residual_pct_of_anchor":0.522,
+    "bands_overlap":true
+  }
+]
