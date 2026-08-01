@@ -1,0 +1,20 @@
+# Single source of truth for CN codes in scope (CLAUDE.md convention: config over code)
+# HS 2027 revision: add concordance mapping here when published, keep old codes for history.
+window: {month_start: 201901}
+codes:
+  "84151010": {desc: "Window/wall/ceiling/floor self-contained", types: [T2, T6], role: core}
+  "84151090": {desc: "Split-system", types: [T3, T4, T5], role: core, classifier: unit_value}
+  "84158100": {desc: "Other, reversible heat/cool", types: [T1, T6], role: core, classifier: unit_value_mass}
+  "84158200": {desc: "Other, cooling only, incl. refrigeration unit", types: [T1, T6], role: core, classifier: unit_value_mass}
+  "84158300": {desc: "Other, no refrigeration unit", types: [edge], role: monitor}
+  "84186100": {desc: "Heat pumps excl. 8415", types: [T7], role: boundary}
+  "84186900": {desc: "Chillers / other refrigeration", types: [], role: satellite_value_index}
+survival_curves:  # Weibull, years; revisit at each validation gate
+  T1: {median: 9, shape: 2.0}
+  T3: {median: 13, shape: 2.5}
+  T4: {median: 13, shape: 2.5}
+  T5: {median: 17, shape: 3.0}
+  T6: {median: 17, shape: 3.0}
+validation:
+  mirror_asymmetry_tolerance: 0.15
+  supp_unit_value_coverage_go: 0.90
