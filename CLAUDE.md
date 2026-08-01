@@ -45,7 +45,16 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
       NI share is a named assumption (RTS-based estimate pending); mirror check
       breaches ±15% on all codes (consignment-vs-origin — VG2 needs an
       origin-aware tolerance or EU-hub adjustment); Comtrade monthly needs a key.
-- [ ] Phase 2: anchors + use-case allocation engine + stock-flow model
+- [x] **Phase 2 core built (1 Aug 2026)** — `scripts/run_phase2.py`: use-case
+      allocation (FR4, share priors in `config/anchors.yaml`) → Weibull
+      stock-flow (FR5) → EHS reconciliation. Draft 2025 baseline: ~4.4m units
+      installed stock (U1 2.6m). **Residual vs EHS anchor +52% (bands overlap)
+      — published, candidate explanations: opening-stock assumptions, portable
+      retirement rate, EHS 'uses AC' understating ownership.**
+- [ ] **Phase 2 gaps**: D3 TM44 ingestion (needs opendatacommunities key),
+      D4 MCS, D6 CDD regression not yet ingested — allocation priors are
+      still uninformed by anchors (FR4.2 update step pending); initial-stock
+      assumptions need sensitivity work against the residual.
 - [ ] Phase 3: validation gate tooling + freeze first vintage (v2026, covering CY2025)
 - [ ] Phase 4: scheduling, monitoring pack, optional dashboard
 

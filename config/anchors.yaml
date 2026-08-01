@@ -1,0 +1,58 @@
+# Phase 2 anchors and use-case allocation priors (PRD FR4/FR5).
+# EVERY number here is an assumption or an external anchor, not a measurement.
+# Allocation outputs must always be labelled modelled (CLAUDE.md hard rule).
+# lo/hi bands are subjective 10-90 ranges; revisit at each validation gate.
+
+ehs_anchor:
+  # EHS 2023-24 via EDRC/Reading reanalysis (docs/RESEARCH_NOTES.md):
+  # 4.3% of English households use AC (~1.06m homes), portables conflated
+  # with fixed. Anchor applies to DOMESTIC (U1) stock, all types combined.
+  england_ac_homes: 1060000
+  anchor_year: 2023
+  # England -> GB scaled by relative cooling degree days, not population
+  # (CLAUDE.md named assumption; Scotland/Wales add little cooling load).
+  england_to_gb_cdd_factor: {central: 1.05, lo: 1.03, hi: 1.08}
+  # Units per AC-using home (portable multiples, multi-room splits).
+  units_per_ac_home: {central: 1.25, lo: 1.00, hi: 1.60}
+
+# T7 boundary toggle (PRD §3.3): include A2A heat pumps in domestic cooling
+# stock comparisons? Reported both ways; this sets the headline choice.
+include_t7_in_domestic_stock: false
+
+# FR4.1 deterministic claims + FR4.2 priors, as a share matrix per type.
+# central shares sum to 1 per type. Sources: PRD §3.3 cell design, installer
+# priors to be evidenced at the gate; T1->U1 is the published >=95% portable
+# assumption.
+use_case_shares:
+  T1: {U1: {central: 0.95, lo: 0.90, hi: 0.98}, U2: {central: 0.05, lo: 0.02, hi: 0.10}}
+  T2: {U1: {central: 0.45, lo: 0.30, hi: 0.60}, U2: {central: 0.40, lo: 0.25, hi: 0.55},
+       U4: {central: 0.15, lo: 0.05, hi: 0.25}}
+  T3: {U1: {central: 0.50, lo: 0.35, hi: 0.65}, U2: {central: 0.45, lo: 0.30, hi: 0.60},
+       U3: {central: 0.05, lo: 0.02, hi: 0.10}}
+  T4: {U1: {central: 0.25, lo: 0.15, hi: 0.40}, U2: {central: 0.60, lo: 0.45, hi: 0.75},
+       U3: {central: 0.15, lo: 0.08, hi: 0.25}}
+  T5: {U3: {central: 0.85, lo: 0.75, hi: 0.92}, U4: {central: 0.15, lo: 0.08, hi: 0.25}}
+  T6: {U2: {central: 0.20, lo: 0.10, hi: 0.30}, U3: {central: 0.65, lo: 0.50, hi: 0.75},
+       U4: {central: 0.15, lo: 0.08, hi: 0.25}}
+  T7: {U1: {central: 0.80, lo: 0.65, hi: 0.90}, U2: {central: 0.20, lo: 0.10, hi: 0.35}}
+
+# FR5 stock-flow: opening stock at end-2018 by type, units. Named
+# assumptions with wide bands (no public census exists — that's the point of
+# the pipeline); initialised to be broadly EHS-consistent and revised once
+# the model residual is published. Initial cohort treated as mid-life
+# (effective age = median_life/2).
+initial_stock_2018:
+  T1: {central: 900000, lo: 500000, hi: 1400000}
+  T2: {central: 150000, lo: 80000, hi: 250000}
+  T3: {central: 900000, lo: 500000, hi: 1300000}
+  T4: {central: 200000, lo: 100000, hi: 350000}
+  T5: {central: 300000, lo: 150000, hi: 500000}   # outdoor modules, not systems
+  T6: {central: 250000, lo: 120000, hi: 400000}
+  T7: {central: 200000, lo: 100000, hi: 350000}
+
+# TM44 gross-up (U3 anchor) — placeholder until D3 ingestion lands
+# (opendatacommunities needs registered API access). Compliance commonly
+# estimated around one-third (RESEARCH_NOTES).
+tm44:
+  compliance_rate: {central: 0.33, lo: 0.20, hi: 0.50}
+  ingested: false

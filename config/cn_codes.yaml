@@ -11,10 +11,12 @@ codes:
   "84186900": {desc: "Chillers / other refrigeration", types: [], role: satellite_value_index}
 survival_curves:  # Weibull, years; revisit at each validation gate
   T1: {median: 9, shape: 2.0}
+  T2: {median: 12, shape: 2.5}
   T3: {median: 13, shape: 2.5}
   T4: {median: 13, shape: 2.5}
   T5: {median: 17, shape: 3.0}
   T6: {median: 17, shape: 3.0}
+  T7: {median: 14, shape: 2.5}
 validation:
   mirror_asymmetry_tolerance: 0.15
   supp_unit_value_coverage_go: 0.90
