@@ -59,9 +59,57 @@
   separation but require outlier handling.
 - Field casing confirmed against live API: MonthId, FlowTypeId,
   SuppressionIndex, CommodityId, Value, NetMass, SuppUnit.
-- Possible unit-count recovery routes (untested): UN Comtrade partner-mirror
-  quantities (D2) and Eurostat COMEXT EU27→UK exports, where the EU CN still
-  carries p/st supplementary units for 8415.
+- Unit-count recovery routes tested 1 Aug 2026 — see "Mirror unit-count
+  check" section below. Summary: COMEXT cannot recover counts (EU CN has no
+  supplementary unit for 8415 either — the earlier p/st assumption was
+  wrong); Comtrade partially can, and is the source for kg/unit priors.
+
+## Mirror unit-count check (verified 1 Aug 2026)
+
+### Eurostat COMEXT — NO
+- Dataset DS-045409 (API: ec.europa.eu/eurostat/api/comext/dissemination/
+  statistics/1.0/data/DS-045409; dims freq/reporter/partner/product/flow/
+  indicators/TIME_PERIOD; indicators VALUE_IN_EUROS, QUANTITY_IN_100KG,
+  SUPPLEMENTARY_QUANTITY).
+- SUPPLEMENTARY_QUANTITY is absent for every 8415 CN8 code and 84186100
+  across 8 reporters (IT/CZ/NL/DE/ES/BE/SE/PL, exports to GB, 2024).
+  Positive controls populated: cars 87032110 (18,501 u), 87032319 (50,715 u),
+  fridges 84181020 (2,712 u) DE→GB 2024. The EU CN, like the UK tariff,
+  assigns no supplementary unit to 8415/841861.
+
+### UN Comtrade partner mirror — PARTIAL (calibration, not direct counts)
+- Public preview endpoint works without a key for annual single-cell queries:
+  comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=&period=&
+  partnerCode=&cmdCode=&flowCode= (filter rows to motCode=0, customsCode=C00,
+  partner2Code=0 to avoid double counting). Full API needs a free key. HS6
+  only — coarser than CN8.
+- Partners reporting GENUINE item counts on exports to UK (qtyUnitCode 5,
+  isQtyEstimated=false): China, Malaysia, Japan, Türkiye, USA.
+  NOT reporting quantity: Thailand, Korea, Vietnam, and all EU27.
+- Share of UK-reported 2024 import value from unit-reporting partners:
+  841510 28% (Thailand+Korea are 50%), 841581 33% (EU 61%), 841582 71%
+  (USA-heavy), 841583 43%, 841861 23% (EU 71%). Too patchy to sum into
+  apparent consumption directly.
+- Consignment vs origin asymmetry is fatal for direct use: UK records
+  $27.7m of Japanese-ORIGIN 841510 imports (2024) while Japan records ~$0
+  dispatched to UK — Japanese goods arrive via EU hubs. Mirror measures
+  direct dispatch, HMRC measures origin.
+- UK's own Comtrade import rows carry UN-ESTIMATED quantities only (fixed
+  netWgt conversion, 23.75 kg/unit for 841510) — modelled, not independent.
+- PRIMARY VALUE — kg/unit calibration priors for the net-mass fallback
+  (all isQtyEstimated=false, 2024):
+  | HS6 | China→UK kg/u | China→World kg/u | China→World $/u |
+  |-----|--------------|------------------|-----------------|
+  | 841510 | 29.3 | 37.4 | 190 |
+  | 841581 | 30.5 | 63.4 | 461 |
+  | 841582 | 24.1 | 30.0 | 181 |
+  | 841583 | 5.6 | 15.3 | 121 |
+  | 841861 | 98.4 | 79.5 | 798 |
+  UK-vs-World gaps show ratios are mix-dependent → prefer partner-route-
+  specific ratios, blend with spec-sheet priors, and re-pull annually.
+  Malaysia/Japan/Türkiye/USA ratios also available per code for
+  route-specific priors (e.g. Malaysia 841510 27.1 kg/u; USA skews heavy:
+  91.6 kg/u 841510, 86.3 kg/u 841582 — packaged/rooftop mix).
 - Swagger (field names/schemas): https://api.uktradeinfo.com/swagger/ui/index
 - OTS monthly, ~2-month lag, revisions restate history → store every pull.
 - **Environment note:** the API bot-blocks some automated fetchers; send a

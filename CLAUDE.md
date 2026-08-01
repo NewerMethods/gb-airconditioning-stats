@@ -28,10 +28,15 @@ pumps), demand-vs-CDD regression (operating stock), and a retail basket (portabl
       declared. NetMass covers 100% of import value with zero suppression →
       net-mass fallback is viable. See docs/RESEARCH_NOTES.md (Phase 0 result)
       and data/raw/uktradeinfo_ots/2026-08-01/ (first stored vintage).
-- [ ] **NEXT ACTION: decide unit-derivation approach for Phase 1** — net-mass ÷
-      assumed unit-mass (priors from spec sheets), possibly cross-checked with
-      Comtrade partner-mirror quantities / Eurostat COMEXT (EU CN still carries
-      p/st for 8415). Classifier must separate on value-per-kg, not value-per-unit.
+- [x] Mirror unit-count check (1 Aug 2026): COMEXT ruled out (EU CN has no
+      supplementary unit for 8415 either). Comtrade gives genuine item counts
+      from China/Malaysia/Japan/Türkiye/USA but only 23–71% value coverage and
+      consignment-vs-origin asymmetry → use as kg/unit calibration priors, not
+      direct counts. See RESEARCH_NOTES.md "Mirror unit-count check".
+- [ ] **NEXT ACTION: Phase 1 with net-mass unit derivation** — units =
+      NetMass ÷ unit-mass prior; priors from Comtrade partner-route kg/unit
+      ratios (China→UK 29.3 kg/u on 841510 etc.) blended with spec sheets,
+      re-pulled annually. Classifier separates on value-per-kg, not value-per-unit.
 - [ ] Phase 1: core trade pipeline (ingestion → classification → apparent consumption)
 - [ ] Phase 2: anchors + use-case allocation engine + stock-flow model
 - [ ] Phase 3: validation gate tooling + freeze first vintage (v2026, covering CY2025)
@@ -108,8 +113,11 @@ layer — it validates, it does not feed.
 - Q1 (unit population rates): RESOLVED 1 Aug 2026 — SuppUnit never populated
   (no supplementary-unit measure in UK tariff for these codes); field casing
   verified against live API. Net-mass fallback confirmed viable (100% value
-  coverage, zero suppression). New open question: source of unit-mass priors
-  and whether Comtrade/COMEXT mirrors can recover true item counts.
+  coverage, zero suppression). Mirror follow-up also RESOLVED: COMEXT no
+  (no supp unit in EU CN), Comtrade partial — kg/unit priors only
+  (RESEARCH_NOTES.md "Mirror unit-count check"). Remaining: blend weights
+  between Comtrade route ratios and spec-sheet priors, and HS6→CN8 mapping
+  of ratios through the classifier.
 - BSRIA purchase: agreed for year 1 (calibration), skip years 2–3. Check FERF /
   NESO-contact access before buying.
 - Chillers (84186900): value-index satellite series only; excluded from unit counts.
